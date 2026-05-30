@@ -8,7 +8,8 @@ export const getFavorites = async (req, res) => {
     );
     res.json(rows);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.log(err.message);
+    res.status(500).json({ error: "Erro interno do servidor" });
   }
 };
 
@@ -30,7 +31,8 @@ export const addFavorite = async (req, res) => {
 
     res.status(201).json({ message: "Favorito adicionado" });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.log(err.message);
+    res.status(500).json({ error: "Erro interno do servidor" });
   }
 };
 
@@ -45,7 +47,8 @@ export const removeFavorite = async (req, res) => {
 
     res.json({ message: "Favorito removido" });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.log(err.message);
+    res.status(500).json({ error: "Erro interno do servidor" });
   }
 };
 
@@ -60,7 +63,8 @@ export const checkFavorite = async (req, res) => {
 
     res.json({ isFavorite: rows.length > 0 });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.log(err.message);
+    res.status(500).json({ error: "Erro interno do servidor" });
   }
 };
 
@@ -72,6 +76,7 @@ export const clearFavorites = async (req, res) => {
     );
     res.json({ message: "Favoritos limpos" });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.log(err.message);
+    res.status(500).json({ error: "Erro interno do servidor" });
   }
 };

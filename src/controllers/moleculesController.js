@@ -94,7 +94,8 @@ export const saveMolecule = async (req, res) => {
 
     res.status(201).json({ id: rows[0]?.id, message: "Molécula salva com sucesso" });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.log(err.message);
+    res.status(500).json({ error: "Erro interno do servidor" });
   }
 };
 
@@ -110,6 +111,7 @@ export const getMoleculeByFormula = async (req, res) => {
     }
     res.json(rows[0]);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.log(err.message);
+    res.status(500).json({ error: "Erro interno do servidor" });
   }
 };

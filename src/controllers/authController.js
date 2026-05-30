@@ -51,8 +51,9 @@ export const register = async (req, res) => {
       message: "Usuário criado com sucesso",
     });
   } catch (err) {
+    console.log(err.message);
     res.status(500).json({
-      error: err.message,
+      error: "Erro interno do servidor",
     });
   }
 };
@@ -106,8 +107,9 @@ export const login = async (req, res) => {
       },
     });
   } catch (err) {
+    console.log(err.message);
     res.status(500).json({
-      error: err.message,
+      error: "Erro interno do servidor",
     });
   }
 };
@@ -137,8 +139,9 @@ export const getMe = async (req, res) => {
 
     res.json(users[0]);
   } catch (err) {
+    console.log(err.message);
     res.status(500).json({
-      error: err.message,
+      error: "Erro interno do servidor",
     });
   }
 };
@@ -161,8 +164,9 @@ export const uploadAvatar = async (req, res) => {
       avatar_url: avatar_base64,
     });
   } catch (err) {
+    console.log(err.message);
     res.status(500).json({
-      error: err.message,
+      error: "Erro interno do servidor",
     });
   }
 };
@@ -221,8 +225,9 @@ export const updateProfile = async (req, res) => {
       user: updatedUser[0],
     });
   } catch (err) {
+    console.log(err.message);
     res.status(500).json({
-      error: err.message,
+      error: "Erro interno do servidor",
     });
   }
 };
@@ -232,8 +237,9 @@ export const deleteAccount = async (req, res) => {
     await db.query("DELETE FROM users WHERE id = ?", [req.user.id]);
     res.json({ message: "Conta excluída com sucesso" });
   } catch (err) {
+    console.log(err.message);
     res.status(500).json({
-      error: err.message,
+      error: "Erro interno do servidor",
     });
   }
 };
@@ -275,7 +281,8 @@ export const forgotPassword = async (req, res) => {
       message: "Se o e-mail estiver cadastrado, você receberá as instruções para redefinir sua senha.",
     });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.log(err.message);
+    res.status(500).json({ error: "Erro interno do servidor" });
   }
 };
 
@@ -311,7 +318,8 @@ export const resetPassword = async (req, res) => {
 
     res.json({ message: "Senha redefinida com sucesso" });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.log(err.message);
+    res.status(500).json({ error: "Erro interno do servidor" });
   }
 };
 
@@ -347,6 +355,7 @@ export const changePassword = async (req, res) => {
 
     res.json({ message: "Senha alterada com sucesso" });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.log(err.message);
+    res.status(500).json({ error: "Erro interno do servidor" });
   }
 };

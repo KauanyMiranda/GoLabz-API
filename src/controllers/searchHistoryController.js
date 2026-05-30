@@ -12,7 +12,8 @@ export const getSearchHistory = async (req, res) => {
     );
     res.json(rows);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.log(err.message);
+    res.status(500).json({ error: "Erro interno do servidor" });
   }
 };
 
@@ -44,7 +45,8 @@ export const addSearchHistory = async (req, res) => {
 
     res.status(201).json({ message: "Pesquisa salva" });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.log(err.message);
+    res.status(500).json({ error: "Erro interno do servidor" });
   }
 };
 
@@ -56,6 +58,7 @@ export const clearSearchHistory = async (req, res) => {
     );
     res.json({ message: "Histórico limpo" });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.log(err.message);
+    res.status(500).json({ error: "Erro interno do servidor" });
   }
 };
