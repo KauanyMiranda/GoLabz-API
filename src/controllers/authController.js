@@ -52,7 +52,7 @@ export const register = async (req, res) => {
       ]
     );
 
-    const verifyLink = `golabz://VerifyEmail?token=${verificationToken}`;
+    const verifyLink = `https://go-labz.vercel.app/VerifyEmail?token=${verificationToken}`;
 
     try {
       await sendVerificationEmail(email, verifyLink);
@@ -282,7 +282,7 @@ export const forgotPassword = async (req, res) => {
       { expiresIn: "15m" }
     );
 
-    const resetLink = `golabz://ResetPassword?token=${token}`;
+    const resetLink = `https://go-labz.vercel.app/ResetPassword?token=${token}`;
 
     try {
       await sendResetEmail(user.email, resetLink);
@@ -435,7 +435,7 @@ export const resendVerificationEmail = async (req, res) => {
       [newToken, user.id]
     );
 
-    const verifyLink = `golabz://VerifyEmail?token=${newToken}`;
+    const verifyLink = `https://go-labz.vercel.app/VerifyEmail?token=${newToken}`;
 
     try {
       await sendVerificationEmail(user.email, verifyLink);
