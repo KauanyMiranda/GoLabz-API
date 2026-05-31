@@ -89,13 +89,6 @@ export const login = async (req, res) => {
 
     const user = users[0];
 
-    if (!user.email_verified) {
-      return res.status(403).json({
-        error: "E-mail não verificado. Verifique sua caixa de entrada ou solicite um novo link de confirmação.",
-        code: "EMAIL_NOT_VERIFIED",
-      });
-    }
-
     const passwordMatch = await bcrypt.compare(
       password,
       user.password_hash
