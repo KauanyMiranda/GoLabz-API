@@ -1,7 +1,8 @@
 import bcrypt from "bcrypt";
+import crypto from "crypto";
 import jwt from "jsonwebtoken";
 import { db } from "../db.js";
-import { sendResetEmail } from "../utils/mailer.js";
+import { sendResetEmail, sendVerificationEmail } from "../utils/mailer.js";
 
 export const register = async (req, res) => {
   try {
@@ -33,10 +34,12 @@ export const register = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    const verificationToken = crypto.randomBytes(32).toString("hex");
+
     await db.query(
       `INSERT INTO users 
-      (nome, cpf, data_nascimento, celular, email, password_hash)
-      VALUES (?, ?, ?, ?, ?, ?)`,
+      (nome, cpf, data_nascimento, celular, email, password_hash, email_verified, verification_token)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         nome,
         cpf,
@@ -44,11 +47,22 @@ export const register = async (req, res) => {
         celular,
         email,
         hashedPassword,
+        0,
+        verificationToken,
       ]
     );
 
+    const verifyLink = `golabz://VerifyEmail?token=${verificationToken}`;
+
+    try {
+      await sendVerificationEmail(email, verifyLink);
+    } catch (mailErr) {
+      console.error("Erro ao enviar e-mail de verificação:", mailErr.message);
+      return res.status(500).json({ error: "Erro ao enviar e-mail de confirmação. Tente fazer login para reenviar." });
+    }
+
     res.status(201).json({
-      message: "Usuário criado com sucesso",
+      message: "Usuário criado com sucesso. Verifique seu e-mail para ativar sua conta.",
     });
   } catch (err) {
     console.log(err.message);
@@ -74,6 +88,13 @@ export const login = async (req, res) => {
     }
 
     const user = users[0];
+
+    if (!user.email_verified) {
+      return res.status(403).json({
+        error: "E-mail não verificado. Verifique sua caixa de entrada ou solicite um novo link de confirmação.",
+        code: "EMAIL_NOT_VERIFIED",
+      });
+    }
 
     const passwordMatch = await bcrypt.compare(
       password,
@@ -354,6 +375,85 @@ export const changePassword = async (req, res) => {
     await db.query("UPDATE users SET password_hash = ? WHERE id = ?", [hashedPassword, req.user.id]);
 
     res.json({ message: "Senha alterada com sucesso" });
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).json({ error: "Erro interno do servidor" });
+  }
+};
+
+export const verifyEmail = async (req, res) => {
+  try {
+    const { token } = req.query;
+
+    if (!token) {
+      return res.status(400).json({ error: "Token é obrigatório" });
+    }
+
+    const [users] = await db.query(
+      "SELECT id FROM users WHERE verification_token = ?",
+      [token]
+    );
+
+    if (users.length === 0) {
+      return res.status(400).json({ error: "Token inválido ou expirado" });
+    }
+
+    await db.query(
+      "UPDATE users SET email_verified = 1, verification_token = NULL WHERE id = ?",
+      [users[0].id]
+    );
+
+    res.json({ message: "E-mail confirmado com sucesso" });
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).json({ error: "Erro interno do servidor" });
+  }
+};
+
+export const resendVerificationEmail = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ error: "E-mail é obrigatório" });
+    }
+
+    const [users] = await db.query(
+      "SELECT id, nome, email, email_verified, verification_token FROM users WHERE email = ?",
+      [email]
+    );
+
+    if (users.length === 0) {
+      return res.json({
+        message: "Se o e-mail estiver cadastrado, você receberá as instruções de confirmação.",
+      });
+    }
+
+    const user = users[0];
+
+    if (user.email_verified) {
+      return res.json({ message: "Este e-mail já foi confirmado." });
+    }
+
+    const newToken = crypto.randomBytes(32).toString("hex");
+
+    await db.query(
+      "UPDATE users SET verification_token = ? WHERE id = ?",
+      [newToken, user.id]
+    );
+
+    const verifyLink = `golabz://VerifyEmail?token=${newToken}`;
+
+    try {
+      await sendVerificationEmail(user.email, verifyLink);
+    } catch (mailErr) {
+      console.error("Erro ao reenviar e-mail de verificação:", mailErr.message);
+      return res.status(500).json({ error: "Erro ao enviar e-mail de confirmação. Tente novamente mais tarde." });
+    }
+
+    res.json({
+      message: "Se o e-mail estiver cadastrado, você receberá as instruções de confirmação.",
+    });
   } catch (err) {
     console.log(err.message);
     res.status(500).json({ error: "Erro interno do servidor" });

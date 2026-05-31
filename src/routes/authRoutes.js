@@ -1,6 +1,6 @@
 import express from "express";
 
-import { register, login, getMe, updateProfile, uploadAvatar, deleteAccount, forgotPassword, resetPassword, changePassword } from "../controllers/authController.js";
+import { register, login, getMe, updateProfile, uploadAvatar, deleteAccount, forgotPassword, resetPassword, changePassword, verifyEmail, resendVerificationEmail } from "../controllers/authController.js";
 import { authMiddleware } from "../middleware/authMiddleware.js";
 import { validateRegister } from "../middleware/validationMiddleware.js";
 
@@ -269,5 +269,54 @@ router.post("/reset-password", resetPassword);
  *         description: Erro interno
  */
 router.put("/change-password", authMiddleware, changePassword);
+
+/**
+ * @swagger
+ * /auth/verify-email:
+ *   get:
+ *     summary: Confirma o e-mail do usuário via token
+ *     tags: [Autenticação]
+ *     parameters:
+ *       - in: query
+ *         name: token
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: E-mail confirmado com sucesso
+ *       400:
+ *         description: Token inválido ou não fornecido
+ *       500:
+ *         description: Erro interno
+ */
+router.get("/verify-email", verifyEmail);
+
+/**
+ * @swagger
+ * /auth/resend-verification:
+ *   post:
+ *     summary: Reenvia o e-mail de confirmação de cadastro
+ *     tags: [Autenticação]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email]
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *     responses:
+ *       200:
+ *         description: Instruções enviadas (se o e-mail existir)
+ *       400:
+ *         description: E-mail não informado
+ *       500:
+ *         description: Erro interno
+ */
+router.post("/resend-verification", resendVerificationEmail);
 
 export default router;

@@ -12,9 +12,23 @@ export async function initDatabase() {
         email VARCHAR(255) NOT NULL UNIQUE,
         password_hash VARCHAR(255) NOT NULL,
         avatar_url LONGTEXT,
+        email_verified TINYINT(1) DEFAULT 0,
+        verification_token VARCHAR(255) DEFAULT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
+
+    // Migração: adiciona colunas de verificação de e-mail se não existirem
+    try {
+      await db.query(`ALTER TABLE users ADD COLUMN email_verified TINYINT(1) DEFAULT 0`);
+    } catch (e) {
+      if (!e.message.includes("Duplicate column")) throw e;
+    }
+    try {
+      await db.query(`ALTER TABLE users ADD COLUMN verification_token VARCHAR(255) DEFAULT NULL`);
+    } catch (e) {
+      if (!e.message.includes("Duplicate column")) throw e;
+    }
 
     await db.query(`
       CREATE TABLE IF NOT EXISTS elements (
