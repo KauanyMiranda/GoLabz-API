@@ -75,7 +75,7 @@ Se você não fez essa solicitação, ignore este e-mail.`,
       </p>
 
       <p style="font-size: 14px; color: #666;">
-        Se você não solicitou a redefinição de senha, pode ignorar este e-mail com segurança.
+        Se você não solicitou a redefinição de senha, pode ignorar este e-mail.
       </p>
 
       <hr style="margin: 24px 0; border: none; border-top: 1px solid #eee;" />
