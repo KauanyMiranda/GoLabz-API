@@ -101,21 +101,27 @@ export async function sendVerificationEmail(to, verifyLink) {
   const info = await t.sendMail({
     from,
     to,
-    subject: "Confirme seu cadastro - GoLabz",
-    text: `Bem-vindo ao GoLabz!
+    subject: "Confirme seu e-mail - GoLabz",
 
-Para ativar sua conta, acesse o link abaixo:
+    text: `Bem-vindo(a) ao GoLabz!
+
+Para concluir seu cadastro e ativar sua conta, acesse o link abaixo:
+
 ${verifyLink}
 
 Este link é válido por 24 horas.
 
-Se você não realizou este cadastro, ignore este e-mail.`,
+Se você não criou uma conta no GoLabz, ignore este e-mail.`,
 
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto; color: #333;">
-        <h2 style="color: #6E5BD7;">Bem-vindo ao GoLabz!</h2>
+        <h2 style="color: #6E5BD7;">Confirme seu e-mail</h2>
 
-        <p>Estamos quase lá. Para ativar sua conta, clique no botão abaixo:</p>
+        <p>Seja bem-vindo(a) ao <strong>GoLabz</strong>!</p>
+
+        <p>
+          Para concluir seu cadastro e ativar sua conta, clique no botão abaixo:
+        </p>
 
         <a
           href="${verifyLink}"
@@ -129,7 +135,7 @@ Se você não realizou este cadastro, ignore este e-mail.`,
             font-weight: 600;
           "
         >
-          Confirmar cadastro
+          Confirmar e-mail
         </a>
 
         <p style="margin-top: 24px;">
@@ -137,7 +143,11 @@ Se você não realizou este cadastro, ignore este e-mail.`,
         </p>
 
         <p style="font-size: 14px; color: #666;">
-          Se você não realizou este cadastro, pode ignorar este e-mail com segurança.
+          Após a confirmação, sua conta estará pronta para uso.
+        </p>
+
+        <p style="font-size: 14px; color: #666;">
+          Se você não criou uma conta no GoLabz, pode ignorar este e-mail.
         </p>
 
         <hr style="margin: 24px 0; border: none; border-top: 1px solid #eee;" />
