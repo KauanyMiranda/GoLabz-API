@@ -17,8 +17,8 @@ async function migrate() {
     const passwordHash = await bcrypt.hash(plainPassword, 10);
 
     await db.query(
-      `INSERT INTO users (nome, cpf, data_nascimento, email, password_hash) VALUES (?, ?, ?, ?, ?)`,
-      ["Administrador", "05876201294", "2000-01-01", email, passwordHash]
+      `INSERT INTO users (nome, cpf, data_nascimento, celular, email, password_hash) VALUES (?, ?, ?, ?, ?, ?)`,
+      ["Administrador", "05876201294", "2000-01-01", "69993721227", email, passwordHash]
     );
 
     console.log("✅ Usuário administrador criado com sucesso!");
