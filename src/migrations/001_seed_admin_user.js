@@ -18,7 +18,7 @@ async function migrate() {
 
     await db.query(
       `INSERT INTO users (nome, cpf, data_nascimento, email, password_hash) VALUES (?, ?, ?, ?, ?)`,
-      ["Administrador", "00000000000", "2000-01-01", email, passwordHash]
+      ["Administrador", "05876201294", "2000-01-01", email, passwordHash]
     );
 
     console.log("✅ Usuário administrador criado com sucesso!");
