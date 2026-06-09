@@ -3,17 +3,17 @@ version: "3.8"
 services:
   mysql:
     image: mysql:8
-    container_name: golabz
+    container_name: golabz-mysql
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: golabz
-    ports:
-      - "3307:3306"
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
     volumes:
-      - mysql_data:/var/lib/mysql
+      - golabz_mysql_data:/var/lib/mysql
+    networks:
+      - internal
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD}"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -21,19 +21,58 @@ services:
 
   api:
     build: .
-    container_name: api
+    container_name: golabz-api
     restart: always
-    ports:
-      - "3000:3000"
     depends_on:
       mysql:
         condition: service_healthy
     environment:
       DB_HOST: mysql
       DB_USER: root
-      DB_PASSWORD: root
-      DB_NAME: golabz
-      JWT_SECRET: segredo_dev_mude_em_producao
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      JWT_SECRET: ${JWT_SECRET}
+      BREVO_API_KEY: ${BREVO_API_KEY}
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASS: ${SMTP_PASS}
+      SMTP_FROM: ${SMTP_FROM}
+    networks:
+      - internal
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.golabz.rule=Host(`golabz.wallyson.com.br`)"
+      - "traefik.http.routers.golabz.entrypoints=websecure"
+      - "traefik.http.routers.golabz.tls.certresolver=le"
+      - "traefik.http.services.golabz.loadbalancer.server.port=3000"
+      - "traefik.http.routers.golabz.service=golabz"
+
+  logs:
+    image: nginx:alpine
+    container_name: golabz-logs
+    restart: always
+    volumes:
+      - ./logs-server/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./logs-server/index.html:/usr/share/nginx/html/index.html:ro
+      - ./autodeploy.log:/var/log/autodeploy.log:ro
+    networks:
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.golabz-logs.rule=Host(`golabz-logs.wallyson.com.br`)"
+      - "traefik.http.routers.golabz-logs.entrypoints=websecure"
+      - "traefik.http.routers.golabz-logs.tls.certresolver=le"
+      - "traefik.http.services.golabz-logs.loadbalancer.server.port=80"
+      - "traefik.http.routers.golabz-logs.service=golabz-logs"
 
 volumes:
-  mysql_data:
+  golabz_mysql_data:
+
+networks:
+  internal:
+  proxy:
+    external: true

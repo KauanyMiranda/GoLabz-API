@@ -1,0 +1,15 @@
+[Unit]
+Description=Auto-deploy golabz
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=simple
+User=toor
+WorkingDirectory=/home/toor/apps/golabz
+ExecStart=/home/toor/apps/golabz/autodeploy.sh
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
